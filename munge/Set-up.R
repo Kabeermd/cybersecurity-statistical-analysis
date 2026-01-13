@@ -1,0 +1,7 @@
+install.packages('ProjectTemplate','ggplot2','dplyr')
+install.packages('tinytex')
+tinytex::install_tinytex()
+library(ProjectTemplate)
+library(ggplot2)
+getwd()
+create.project("CyberAnalysis_PT_Stats")
