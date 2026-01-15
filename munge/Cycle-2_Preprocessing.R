@@ -1,8 +1,13 @@
-library(dplyr)
 
-# -------------------------------
-# STEP 1: Week 1 engagement only
-# -------------------------------
+#--------------------------
+#Preprocessing for Cycle -2
+#--------------------------
+
+
+
+#-----------------------
+#Week 1 engagement only
+#-----------------------
 
 cycle2_wk1_engagement <- step_activity_all %>%
   mutate(
@@ -18,7 +23,7 @@ cycle2_wk1_engagement <- step_activity_all %>%
   )
 
 # -------------------------------
-# STEP 2: Combine with outcomes
+# Combining with outcomes
 # -------------------------------
 
 cycle2_data <- cycle1_outcomes %>%
@@ -33,7 +38,7 @@ cycle2_data <- cycle1_outcomes %>%
   )
 
 # -------------------------------
-# STEP 3: Sanity checks
+# Sanity checks (To check for results of preprocessing step)
 # -------------------------------
 
 message("Cycle 2 rows: ", nrow(cycle2_data))

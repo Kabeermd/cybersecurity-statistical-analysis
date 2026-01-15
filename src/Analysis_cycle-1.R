@@ -1,12 +1,12 @@
-library(dplyr)
-library(ggplot2)
+
+#Analysis for Crisp-dm cycle-one (purchase statement based upon the engagement)
 
 #Purchase rate based on engagement (Line Chart)
 cycle1_plot_df <- cycle1_data %>%
   mutate(
     engaged = total_steps_completed > 0
   ) %>%
-  filter(engaged) %>%   # optional: focus on learners who did something
+  filter(engaged) %>%   
   mutate(
     engagement_group = ntile(total_steps_completed, 4) %>%
       factor(labels = c("Low", "Medium-Low", "Medium-High", "High"))
@@ -29,7 +29,7 @@ ggplot(cycle1_plot_df,
   )
 
 
-#Purchase rate by weeks active
+#Purchase rate by weeks active (Bar chart)
 cycle1_weeks_df <- cycle1_data %>%
   mutate(weeks_active = factor(weeks_active, levels = 0:3)) %>%
   group_by(weeks_active) %>%

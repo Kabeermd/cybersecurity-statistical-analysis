@@ -1,55 +1,72 @@
-library(dplyr)
 
-# -------------------------------
+#--------------------------
+#Preprocessing for Cycle -1
+#--------------------------
+
+# ----------------
 # Helper functions
-# -------------------------------
+# ----------------
 
 get_run_id <- function(path) {
   as.integer(sub(".*cyber-security-([0-9]+)_.*", "\\1", basename(path)))
 }
 
 clean_names <- function(Sample_df) {
-  names(Sample_df) <- tolower(gsub("[^a-z0-9]+", "_", names(df)))
-  df
+  names(Sample_df) <- tolower(gsub("[^a-z0-9]+", "_", names(Sample_df)))
+  Sample_df
 }
 
-# -------------------------------
+
+# --------------------------
 # Load enrolments (all runs)
-# -------------------------------
+# --------------------------
 
 enrol_files <- list.files(
   "data",
   pattern = "^cyber-security-[1-7]_enrolments\\.csv$",
   full.names = TRUE
 )
+print(enrol_files)
 
 enrolments_all <- bind_rows(lapply(enrol_files, function(f) {
-  Sample_df <- read.csv(f, stringsAsFactors = FALSE)
-  Sample_df <- clean_names(Sample_df)
-  Sample_df$run_id <- get_run_id(f)
-  Sample_df
+  Temp <- read.csv(f, stringsAsFactors = FALSE)
+  Temp <- clean_names(Temp)
+  Temp$run_id <- get_run_id(f)
+  Temp
 }))
 
-# -------------------------------
+#Changing Blank Spaces to N/a
+enrolments_all <- enrolments_all %>%
+  mutate(
+    purchased_statement_at = na_if(purchased_statement_at, ""),
+    fully_participated_at  = na_if(fully_participated_at, ""),
+    enrolled_at            = na_if(enrolled_at, "")
+  )
+
+str(enrolments_all)
+
+# ------------------------------
 # Load step activity (all runs)
-# -------------------------------
+# ------------------------------
 
 step_files <- list.files(
   "data",
   pattern = "^cyber-security-[1-7]_step-activity\\.csv$",
   full.names = TRUE
 )
+print(step_files)
 
 step_activity_all <- bind_rows(lapply(step_files, function(f) {
-  Sample_df <- read.csv(f, stringsAsFactors = FALSE)
-  Sample_df <- clean_names(df)
-  Sample_df$run_id <- get_run_id(f)
-  Sample_df
+  Temp <- read.csv(f, stringsAsFactors = FALSE)
+  Temp <- clean_names(Temp)
+  Temp$run_id <- get_run_id(f)
+  Temp
 }))
 
 # -------------------------------
-# STEP 3: Business outcomes
+# Creating outcomes(Cycle1_outcomes)
 # -------------------------------
+print(names(enrolments_all))
 
 cycle1_outcomes <- enrolments_all %>%
   mutate(
@@ -66,9 +83,9 @@ cycle1_outcomes <- enrolments_all %>%
     fully_participated_at
   )
 
-# -------------------------------
-# STEP 4: Engagement metrics
-# -------------------------------
+# ------------------
+# Engagement metrics
+# ------------------
 
 cycle1_engagement <- step_activity_all %>%
   mutate(
@@ -81,9 +98,9 @@ cycle1_engagement <- step_activity_all %>%
     .groups = "drop"
   )
 
-# -------------------------------
-# STEP 5: Combine (LEFT JOIN)
-# -------------------------------
+# ---------------------
+#  Combine (Left Join)
+# ---------------------
 
 cycle1_data <- cycle1_outcomes %>%
   left_join(cycle1_engagement,
@@ -94,12 +111,14 @@ cycle1_data <- cycle1_outcomes %>%
     weeks_active = ifelse(is.na(weeks_active), 0, weeks_active)
   )
 
-# -------------------------------
-# STEP 6: Sanity checks
-# -------------------------------
+# --------------
+# Sanity checks(To check for results of preprocessing step)
+# --------------
 
 message("Total learner-run rows: ", nrow(cycle1_data))
+message("Purchase count: ", sum(cycle1_data$purchased))
 message("Purchase rate: ", round(mean(cycle1_data$purchased), 4))
+message("Completion count: ", sum(cycle1_data$completed))
 message("Completion rate: ", round(mean(cycle1_data$completed), 4))
 message("Runs included: ",
         paste(sort(unique(cycle1_data$run_id)), collapse = ", "))

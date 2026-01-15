@@ -1,4 +1,7 @@
-#Week-1 Engamgement table
+
+#Analysis for Crisp-dm cycle-two (Does early engagement shows any change in the purchasers behaviors)
+
+#Week-1 Engagement table
 cycle2_table1 <- cycle2_data %>%
   group_by(purchased) %>%
   summarise(
@@ -11,7 +14,7 @@ cycle2_table1 <- cycle2_data %>%
 
 cycle2_table1
 
-#Purchase and completation rate by week-1
+#Purchase and completion rate by week-1
 cycle2_table2 <- cycle2_data %>%
   group_by(wk1_active) %>%
   summarise(
