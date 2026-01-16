@@ -1,0 +1,17 @@
+[33mcommit 18aefa6b9a82a23729715733e79357d4d892fbd1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: KabeerMohammed <M.K.Sheikh2@newcastle.ac.uk>
+Date:   Wed Jan 14 16:06:55 2026 +0000
+
+    Completed first cycle of analysis to find the insgits from data with the help of visualizations
+
+[33mcommit 0db1b603b72526f266c5a3bf195213c2e8f3f2d7[m
+Author: KabeerMohammed <M.K.Sheikh2@newcastle.ac.uk>
+Date:   Wed Jan 14 12:37:07 2026 +0000
+
+    Trimmed datasets to just enrolment and step activity based on my requirements and added cycle -1 preprocessing
+
+[33mcommit f5af98d02486f7dfea2dcb073082446763664f27[m
+Author: KabeerMohammed <M.K.Sheikh2@newcastle.ac.uk>
+Date:   Tue Jan 13 17:16:38 2026 +0000
+
+    Added the dataset to work and basic packages instalattion has been completed with changes done in global.dcf in config as well

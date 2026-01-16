@@ -63,9 +63,9 @@ step_activity_all <- bind_rows(lapply(step_files, function(f) {
   Temp
 }))
 
-# -------------------------------
-# Creating outcomes(Cycle1_outcomes)
-# -------------------------------
+# -------------------------------------------
+# Creating Business outcomes(Cycle1_outcomes)
+# -------------------------------------------
 print(names(enrolments_all))
 
 cycle1_outcomes <- enrolments_all %>%
@@ -122,3 +122,6 @@ message("Completion count: ", sum(cycle1_data$completed))
 message("Completion rate: ", round(mean(cycle1_data$completed), 4))
 message("Runs included: ",
         paste(sort(unique(cycle1_data$run_id)), collapse = ", "))
+
+cache("cycle1_data")
+

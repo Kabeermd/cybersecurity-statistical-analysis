@@ -1,0 +1,337 @@
+---
+title: Analysis of Learner Engagement in Cyber Security massive open online course (MOOC) by FutureLearn
+author: "Mohammed Kabeer Sheikh"
+date: "2026-01-14"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+
+library(dplyr)
+library(ggplot2)
+
+proj_root <- normalizePath("..")
+
+cycle1_data <- readRDS(file.path(proj_root, "data", "cycle1_data.rds"))
+cycle2_data <- readRDS(file.path(proj_root, "data", "cycle2_data.rds"))
+
+```
+
+# Introduction
+
+This report applies the Cross-Industry Standard Process for Data Mining (CRISP-DM) to learner interaction data from a three-week massive open online cyber security course (MOOC) delivered by the FutureLearn platform across seven course runs.
+
+
+The key stakeholders for this analysis include course designers at Newcastle University and the platform provider FutureLearn. These stakeholders are interested in understanding learner behavior in order to improve both the educational effectiveness and the commercial performance of the course. In particular, insights derived from learner engagement data may inform course design decisions, support early intervention for at-risk learners and contribute to improved completion and attainment outcomes as well as increased statement purchases.
+
+
+The primary research question addressed in this report is:
+  
+  **"How is learner engagement associated with statement purchase and course completion and do these associations emerge early in the course?**
+
+
+To address this question, two CRISP-DM cycles are conducted. The first cycle provides a broad descriptive analysis of overall learner engagement across the full course duration. The second cycle refines this analysis by focusing specifically on early engagement during the first week of the course.
+
+
+## CRISP-DM Cycle-1
+
+### Business Understanding
+
+For the platform provider and course designers statement purchases represent a direct revenue stream while course completion reflects learner satisfaction and successful knowledge acquisition. Understanding learner behavior is therefore important from both a commercial and an educational perspective.
+
+The business objective here is to understand whether learner engagement throughout the course is associated with key outcomes of interest. It also represents a critical signal for both educational effectiveness and commercial sustainability, as it reflects the extent to which learners interact with course materials and is often linked to motivation,commitment and value of the course.
+
+These relationships can inform decisions around course design and intervention strategies aimed at improving both revenue and completion rates.
+
+### Data Understanding
+
+The Cyber Security FutureLearn MOOC dataset contains raw interaction data collected from learners as they progressed through a three-week online course. The data span seven separate course runs, with each run comprising multiple datasets that capture different aspects of learner behavior and course participation. For each course run, several datasets are available, including enrollment records, step activity logs, question responses, survey responses and video interaction statistics etc. These datasets are linked through a unique learner identifier, enabling behavioral data to be associated with learner outcomes across the course.
+
+This analysis focuses on two datasets available for each of the seven course runs:
+
+- **Enrollment data**, containing learner identifiers and time stamps related to course enrollment, statement purchase and course completion  
+- **Step activity data**, recording learner interactions with individual course steps across the three weeks of the course  
+
+The enrollment data provide the primary outcome variables used in the analysis while the step activity data provide behavioral measures of learner engagement.
+
+
+### Data Preparation
+
+Data from all seven course runs were combined into unified enrollment and step activity datasets. A run identifier was derived from file names and added to each dataset. This enabled comparisons across course iterations and ensured that learners participating in multiple runs were treated as distinct learner–run observations.
+
+Engagement measures were derived from step activity data by identifying whether a learner had completed a step, based on the presence of a completion timestamp. Learners with no recorded step activity were retained in the dataset and assigned zero engagement values to avoid selection bias.
+Purchase and completion outcomes were derived from enrollment timestamps after converting empty strings to missing values.
+
+After data preparation, a series of validation checks were performed to confirm that the preprocessing steps had been applied correctly. These checks verified the number of learner–run observations, the inclusion of all course runs and the resulting purchase and completion rates. A summary of these checks is provided in Table 1.1 below.
+
+
+```{r,echo=FALSE}
+prep_checks_cycle1 <- data.frame(
+  Metric = c(
+    "Total learner–run observations",
+    "Statement purchases (count)",
+    "Statement purchase rate",
+    "Course completions (count)",
+    "Course completion rate",
+    "Course runs included"
+  ),
+  Value = c(
+    nrow(cycle1_data),
+    sum(cycle1_data$purchased),
+    round(mean(cycle1_data$purchased), 4),
+    sum(cycle1_data$completed),
+    round(mean(cycle1_data$completed), 4),
+    paste(sort(unique(cycle1_data$run_id)), collapse = ", ")
+  )
+)
+
+knitr::kable(
+  prep_checks_cycle1,
+  caption = "Cycle-1 data preparation validation checks"
+)
+```
+
+### Modelling
+
+Learner engagement was measured using step activity data aggregated across the entire course. Two primary measures were used the total number of steps completed and the number of weeks in which a learner was active. These measures capture both the intensity and persistence of learner participation.
+
+Figure 1 shows statement purchase rates across engagement levels by grouping learners into quartiles based on the total number of steps completed (Low, Medium–Low, Medium–High, High). Purchase rates increase monotonically from the lowest to the highest engagement group. The high-engagement quartile exhibits the largest purchase rate, while the low and medium-low groups show very low purchase rates. This indicates a strong positive association between higher overall engagement and the likelihood of purchasing a statement.
+
+Figure 2 shows purchase rates by engagement measured as the number of weeks in which learners were active. A clear gradient is visible here as learners active in more weeks have substantially higher purchase rates. In particular, learners active in all weeks (3 weeks) show a markedly higher purchase rate than those active for 0–2 weeks. This suggests that sustained participation across the course is strongly related to monetization outcomes.
+
+Figure 3 shows variation in statement purchase rates across the seven course runs. While purchase rates remain low across all runs, noticeable differences are observed between iterations of the course. Learners engaging with higher runs exhibit purchase rates above the overall mean while others fall below it indicating that course run characteristics have an influence on monetization outcomes.
+
+Overall, these plots demonstrate a clear descriptive association between overall learner engagement and statement purchase, while also highlighting variation across course runs and significant diversity within the learner population.
+
+
+### Evaluation
+
+The modelling shows that overall learner engagement is strongly associated with statement purchase with higher engagement intensity and greater persistence across weeks corresponding to higher purchase rates. It clearly show a clear monotonic pattern where learners who engage more deeply and more consistently are more likely to purchase a statement. However, purchases remain rare overall and engagement is measured across the full course duration which limits the usefulness of these findings for early intervention. Despite these limitations, the results confirm that engagement is an important indicator of monetization and justify a deeper analysis focused on early-stage learner behavior.
+
+
+```{r, echo=FALSE,fig.cap="Purchase rate by overall learner engagement level",fig.width=5,fig.height=3}
+cycle1_plot_df <- cycle1_data %>%
+  mutate(
+    engaged = total_steps_completed > 0
+  ) %>%
+  filter(engaged) %>%   
+  mutate(
+    engagement_group = ntile(total_steps_completed, 4) %>%
+      factor(labels = c("Low", "Medium-Low", "Medium-High", "High"))
+  ) %>%
+  group_by(engagement_group) %>%
+  summarise(
+    n_learners = n(),
+    purchase_rate = mean(purchased),
+    .groups = "drop"
+  )
+
+ggplot(cycle1_plot_df,
+       aes(x = engagement_group, y = purchase_rate, group = 1)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(
+    title = "Purchase rate by engagement level",
+    x = "Engagement group",
+    y = "Purchase rate"
+  )
+```
+
+
+```{r,echo=FALSE,fig.cap="Purchase rate based on the learnes activeness across weeks",fig.width=5,fig.height=3}
+cycle1_weeks_df <- cycle1_data %>%
+  mutate(weeks_active = factor(weeks_active, levels = 0:3)) %>%
+  group_by(weeks_active) %>%
+  summarise(
+    n_learners = n(),
+    purchase_rate = mean(purchased),
+    .groups = "drop"
+  )
+
+ggplot(cycle1_weeks_df, aes(x = weeks_active, y = purchase_rate)) +
+  geom_col(aes(fill = weeks_active), show.legend = FALSE) +
+  labs(
+    title = "Purchase rate by number of active weeks",
+    x = "Weeks active (based on step completion)",
+    y = "Purchase rate"
+  )
+
+```
+
+```{r,echo=FALSE,fig.cap="Purchase rate based across the course runs",fig.width=5,fig.height=3}
+
+cycle1_run_df <- cycle1_data %>%
+  group_by(run_id) %>%
+  summarise(
+    n_learners = n(),
+    purchase_rate = mean(purchased),
+    .groups = "drop"
+  )
+
+overall_mean <- mean(cycle1_data$purchased)
+
+ggplot(cycle1_run_df,
+       aes(x = run_id, y = purchase_rate)) +
+  geom_point(size = 3) +
+  geom_hline(yintercept = overall_mean,
+             linetype = "dashed", colour = "red") +
+  labs(
+    title = "Purchase rate across course runs",
+    x = "Run ID",
+    y = "Purchase rate"
+  )
+
+```
+
+# CRISP-DM Cycle-2
+
+
+
+## Buisness Understanding
+
+The business objectives remain unchanged in the second CRISP-DM cycle. However, the focus shifts to determining whether engagement differences between purchasers and non-purchasers are already present in the first week of the course.
+
+
+## Data Understanding
+
+The first CRISP-DM cycle has showed that the enrollment and step activity datasets are consistent across all seven course runs and suitable for analyzing learner engagement and outcomes. Minor data quality issues, such as empty strings in timestamp fields, were identified and corrected during data preparation of first cycle so no further exploratory data analysis was required and the CRISP-DM process could proceed to modelling in this cycle as well.
+
+
+## Data Prepration
+
+The prepared dataset from first CRISP-DM Cycle was reused and extended to derive early-stage engagement measures. Week-1 activity indicators were calculated from step activity data including whether a learner was active in the first week and the number of steps completed during that period. No additional data cleaning was required beyond the transformations already applied in first CRISP-DM Cycle and the resulting dataset was suitable for analyzing early engagement patterns and their relationship to course outcomes.
+
+
+## Modelling
+The modelling here focuses on early learner engagement specifically activity during Week 1 to assess whether meaningful associations with purchase and completion outcomes emerge at an early stage of the course.
+
+Table 2 summaries Week 1 engagement metrics by statement purchase outcome. Learners who bought a statement were far more engaged in Week 1. While only 39% of non-purchasers were active in Week-1 over 92% of purchasers showed activity during the first week and they completed many more steps on average (about 16 vs. 4.5). Early engagement differs strongly between the two groups.
+
+Table 3 further reinforces this relationship by comparing purchase and completion rates between learners who were active in Week 1 and those who were not. Learners active in the first week show a purchase rate nearly eighteen times higher than inactive learners and a completion rate of 14%, compared to less than 1% for inactive learners. This highlights Week 1 activity as a strong differentiator of later outcomes.
+
+Figure 4 visualizes the distribution of Week 1 steps completed by purchase outcome. The boxplot shows a clear separation between purchasers and non-purchasers with purchasers clustered at substantially higher step counts and far fewer learners with zero activity. This suggests that even modest early participation may be indicative of later purchasing behavior. While non-purchasers median lies close to zero.
+
+Figure 5 presents purchase rates across increasingly intensive Week 1 engagement bands based on steps completed. Purchase rates increase monotonically as the number of completed steps rises, with the highest engagement band (6+ steps) showing a sharp increase in purchase likelihood. This non-linear trend suggests that a threshold level of early engagement may exist beyond which learners are significantly more likely to purchase a statement.
+
+
+## Evaluation
+
+The second CRISP-DM cycle demonstrates that differences in learner behavior emerge within the first week of the course. Learners who engage early are substantially more
+likely to purchase a statement and complete the course. These findings suggest that early engagement is a key indicator of both monetisation and persistence.
+
+
+
+
+```{r,echo=FALSE,fig.cap="Engagement table for Week-1"}
+cycle2_table1 <- cycle2_data %>%
+  mutate(
+    purchased_label = ifelse(purchased, "Yes", "No")
+  )%>%
+  group_by(purchased_label) %>%
+  summarise(
+    learners = n(),
+    wk1_active_rate = round(mean(wk1_active), 4),
+    mean_wk1_steps = round(mean(wk1_steps_completed), 2),
+    median_wk1_steps = median(wk1_steps_completed),
+    .groups = "drop"
+  )
+
+knitr::kable(
+  cycle2_table1,
+  col.names = c("Purchased statement", "Learners", "Week 1 active rate","Mean Week 1 steps", "Median Week 1 steps"),
+  caption = "Week 1 engagement summary by purchase outcome",
+  digits = 3
+)
+```
+ 
+ 
+ 
+
+
+```{r,echo=FALSE,fig.cap="Purchase and completion rate by week-1"}
+cycle2_table2 <- cycle2_data %>%
+   mutate(
+    wk1_active_label = ifelse(wk1_active, "Yes", "No")
+  ) %>%
+  group_by(wk1_active_label) %>%
+  summarise(
+    learners = n(),
+    purchase_rate = round(mean(purchased), 4),
+    completion_rate = round(mean(completed), 4),
+    .groups = "drop"
+  )
+knitr::kable(
+  cycle2_table2,
+  col.names = c("Active in Week 1", "Learners","Purchase rate", "Completion rate"),
+  caption = "Purchase and completion rates by Week 1 activity status",
+  digits = 3
+)
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="Week 1 steps completed by statement purchase outcome",fig.width=5,fig.height=3}
+ggplot(cycle2_data, aes(x = factor(purchased), y = wk1_steps_completed)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.2) +
+  scale_x_discrete(labels = c("Not Purchased", "Purchased")) +
+  scale_y_continuous(trans = "log1p") +
+  labs(
+    title = "Week 1 engagement by statement purchase outcome",
+    subtitle = "Log-scaled y-axis used to account for skewed engagement distribution",
+    x = "Statement purchased",
+    y = "Week 1 steps completed (log scale)"
+  )
+```
+
+
+
+
+
+
+```{r,echo=FALSE, message=FALSE, warning=FALSE,fig.cap="Purchase rate by week-1 engagement",fig.width=5,fig.height=3}
+cycle2_band_df <- cycle2_data %>%
+  mutate(
+    wk1_band = case_when(
+      wk1_steps_completed == 0 ~ "0",
+      wk1_steps_completed <= 2 ~ "1–2",
+      wk1_steps_completed <= 5 ~ "3–5",
+      TRUE ~ "6+"
+    )
+  ) %>%
+  group_by(wk1_band) %>%
+  summarise(
+    n = n(),
+    purchase_rate = mean(purchased),
+    .groups = "drop"
+  )
+
+ggplot(cycle2_band_df, aes(x = wk1_band, y = purchase_rate, group = 1)) +
+  geom_point(size = 3) +
+  geom_line() +
+  labs(
+    title = "Purchase rate by Week 1 engagement band",
+    x = "Week 1 steps completed (banded)",
+    y = "Purchase rate"
+  )
+
+```
+
+## Deployment
+
+From a deployment perspective, these findings suggest that early intervention strategies targeting learner engagement may be effective in improving both learner
+outcomes and course revenue. This behavioral indicators could be used to identify high-value learners and to design timely interventions for less-engaged participants or early engagement metrics could be used as indicators to identify learners who may benefit from additional support.
+
+
+## Final Conclusion 
+
+This analysis applied two CRISP-DM cycles to learner interaction data from an online cyber security course. The results show that learner engagement is strongly associated with purchasing and completion outcomes and that these associations emerge as early as the first week of the course so early engagement plays a critical role in both learner success and monetization. These two CRISP- DM cycle results support the refinement of the original research question by showing that engagement–outcome relationships are observable very early in the learning journey.
+
+ 
+
+
+
+

@@ -61,3 +61,4 @@ ggplot(cycle1_run_df,
     y = "Purchase rate"
   )
 
+cache("cycle2_data")

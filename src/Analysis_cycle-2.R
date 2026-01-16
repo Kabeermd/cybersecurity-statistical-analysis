@@ -43,10 +43,10 @@ ggplot(cycle2_data, aes(x = factor(purchased), y = wk1_steps_completed)) +
 cycle2_band_df <- cycle2_data %>%
   mutate(
     wk1_band = case_when(
-      wk1_steps_completed == 0,   #"0"
-      wk1_steps_completed <= 2,  #"1–2"
-      wk1_steps_completed <= 5,  #"3–5"
-      TRUE #"6+"
+      wk1_steps_completed == 0 ~ "0",
+      wk1_steps_completed <= 2 ~ "1–2",
+      wk1_steps_completed <= 5 ~ "3–5",
+      TRUE ~ "6+"
     )
   ) %>%
   group_by(wk1_band) %>%

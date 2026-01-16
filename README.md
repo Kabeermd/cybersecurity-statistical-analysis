@@ -1,39 +1,52 @@
-# CyberAnalysis_PT_Stats
+#----------------------------------
+# Cyber Security MOOC Data Analysis
+#----------------------------------
 
-Welcome to ProjectTemplate!
+# Analysis of Learner Engagement in Cyber Security massive open online course (MOOC) by FutureLearn
+# Author: Mohammed Kabeer Sheikh
+# Date: 15th January 2026
 
-This file introduces you to ProjectTemplate, but you should eventually replace
-the contents of this file with an introduction to your project. People who
-work with your data in the future will thank you for it, including your future
-self.
 
-ProjectTemplate is an R package that helps you organize your statistical
-analysis projects. Since you're reading this file, we'll assume that you've
-already called `create.project()` to set up this project and all of its
-contents.
+### This project applies the CRISP-DM framework to learner interaction data from a three-week cyber security MOOC delivered on the FutureLearn platform across seven course runs.
+### The analysis investigates how learner engagement relates to two key outcomes Statement purchase (monetisation) and Course completion (learner success)
 
-To load your new project, you'll first need to `setwd()` into the directory
-where this README file is located. Then you need to run the following two
-lines of R code:
+### Two CRISP-DM cycles are conducted:
+### 1) Cycle 1 – Descriptive analysis of overall engagement across the full course
 
-	library('ProjectTemplate')
-	load.project()
+### 2) Cycle 2 – Focused analysis of early (Week 1) engagement
 
-After you enter the second line of code, you'll see a series of automated
-messages as ProjectTemplate goes about doing its work. This work involves:
-* Reading in the global configuration file contained in `config`.
-* Loading any R packages you listed in the configuration file.
-* Reading in any datasets stored in `data` or `cache`.
-* Preprocessing your data using the files in the `munge` directory.
+##---------------
+## PROJECT SETUP
+##---------------
 
-Once that's done, you can execute any code you'd like. For every analysis
-you create, we'd recommend putting a separate file in the `src` directory.
-If the files start with the two lines mentioned above:
+### This project uses the ProjectTemplate framework.
+### Raw course data are stored in the 'data' folder and are not modified.
+### Preprocessing scripts are stored in the 'munge' folder and generate derived datasets.
+### Derived objects created during preprocessing are cached in the 'cache' folder and for permanent reproducibility also stored in "data".
+### Project options are defined in the 'config/global.dcf' file.
+### The 'load_libraries' option is set to TRUE to load required packages automatically.
+### The R Markdown report file is stored in the 'reports' folder.
 
-	library('ProjectTemplate')
-	load.project()
+##-------------------
+## PROJECT EXECUTION
+##-------------------
 
-You'll have access to all of your data, already fully preprocessed, and
-all of the libraries you want to use.
+### The user should open the R Markdown report file located in the 'reports' folder.
+### The project should be loaded by calling load.project().
+### Cached objects will be restored automatically if available.
+### The user should click 'Knit' in RStudio to reproduce the analysis.
+### This will generate the final report in PDF format.
 
-For more details about ProjectTemplate, see http://projecttemplate.net
+##-------------------
+## PROJECT STRUCTURE
+##-------------------
+
+### data/     – Raw course data (CSV files, unmodified,modified)
+### config/   - Includes the global.dcf file used to set global options.
+### munge/    – Data preprocessing scripts (Cycle 1 & Cycle 2)
+### cache/    – Cached derived datasets (cycle1_data, cycle2_data)
+### src/      – Analysis and plotting scripts
+### reports/  – R Markdown report 
+
+### other folders not used here.
+
