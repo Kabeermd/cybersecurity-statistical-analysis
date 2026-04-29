@@ -1,52 +1,47 @@
-#----------------------------------
-# Cyber Security MOOC Data Analysis
-#----------------------------------
+# Cyber Security MOOC — Statistical Analysis in R
 
-# Analysis of Learner Engagement in Cyber Security massive open online course (MOOC) by FutureLearn
-# Author: Mohammed Kabeer Sheikh
-# Date: 15th January 2026
+Learning analytics on 7 runs of a FutureLearn Cyber Security MOOC using R, CRISP-DM, and the ProjectTemplate framework. Investigates how learner engagement predicts course completion and statement purchase.
 
+## Overview
 
-### This project applies the CRISP-DM framework to learner interaction data from a three-week cyber security MOOC delivered on the FutureLearn platform across seven course runs.
-### The analysis investigates how learner engagement relates to two key outcomes Statement purchase (monetisation) and Course completion (learner success)
+This project applies the **CRISP-DM** framework to learner interaction data from a three-week cyber security MOOC delivered on the FutureLearn platform across seven course runs. Two analytical cycles investigate how engagement relates to:
 
-### Two CRISP-DM cycles are conducted:
-### 1) Cycle 1 – Descriptive analysis of overall engagement across the full course
+- **Statement purchase** — monetisation outcome
+- **Course completion** — learner success outcome
 
-### 2) Cycle 2 – Focused analysis of early (Week 1) engagement
+## CRISP-DM Cycles
 
-##---------------
-## PROJECT SETUP
-##---------------
+### Cycle 1 — Full-course Engagement
+Descriptive analysis of overall learner engagement across all three weeks. Identifies engagement patterns (step activity, video views, comments) correlated with completion and purchase.
 
-### This project uses the ProjectTemplate framework.
-### Raw course data are stored in the 'data' folder and are not modified.
-### Preprocessing scripts are stored in the 'munge' folder and generate derived datasets.
-### Derived objects created during preprocessing are cached in the 'cache' folder and for permanent reproducibility also stored in "data".
-### Project options are defined in the 'config/global.dcf' file.
-### The 'load_libraries' option is set to TRUE to load required packages automatically.
-### The R Markdown report file is stored in the 'reports' folder.
+### Cycle 2 — Early Engagement (Week 1)
+Focused analysis of Week 1 behaviour as a leading indicator of final outcomes. Tests whether early engagement signals can predict later monetisation and completion.
 
-##-------------------
-## PROJECT EXECUTION
-##-------------------
+## Project Structure
 
-### The user should open the R Markdown report file located in the 'reports' folder.
-### The project should be loaded by calling load.project().
-### Cached objects will be restored automatically if available.
-### The user should click 'Knit' in RStudio to reproduce the analysis.
-### This will generate the final report in PDF format.
+```
+data/       Raw FutureLearn CSV files (7 course runs, unmodified + derived)
+config/     global.dcf — ProjectTemplate options and package loading
+munge/      Preprocessing scripts for Cycle 1 and Cycle 2
+cache/      Cached derived datasets (cycle1_data, cycle2_data)
+src/        Analysis and plotting scripts
+reports/    R Markdown report (knit to PDF)
+```
 
-##-------------------
-## PROJECT STRUCTURE
-##-------------------
+## How to Run
 
-### data/     – Raw course data (CSV files, unmodified,modified)
-### config/   - Includes the global.dcf file used to set global options.
-### munge/    – Data preprocessing scripts (Cycle 1 & Cycle 2)
-### cache/    – Cached derived datasets (cycle1_data, cycle2_data)
-### src/      – Analysis and plotting scripts
-### reports/  – R Markdown report 
+1. Open `CyberAnalysis_PT_Stats.Rproj` in RStudio
+2. Call `load.project()` in the console — packages load and cached objects restore automatically
+3. Open the `.Rmd` file in `reports/`
+4. Click **Knit** to reproduce the full analysis as a PDF report
 
-### other folders not used here.
+## Tech Stack
 
+- R, RStudio
+- ProjectTemplate framework
+- dplyr, ggplot2, tidyr
+- renv (dependency management)
+
+## Author
+
+Mohammed Kabeer Sheikh — Newcastle University (January 2026)
